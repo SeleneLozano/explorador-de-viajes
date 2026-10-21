@@ -5,7 +5,8 @@ Comunicación con la API de países
 CONFIGURACIÓN DE LA API
 ========================================= */
 const API_URL =
-    "https://api.restcountries.com/countries/error";
+"https://juancognitus.github.io/explorador-viajes-api/paises.json";
+
 export async function obtenerPaises() {
 try {
 /* =====================================

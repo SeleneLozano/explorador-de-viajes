@@ -7,13 +7,18 @@
    IMPORTACIONES
 ========================================= */
 import { obtenerPaises } from "./api/countriesApi.js";
+import {
+  mostrarCargando,
+  mostrarError,
+  renderPaises,
+  actualizarContador
+} from "./ui/ui.js";
 
 /* =========================================
    REFERENCIAS DEL DOM
 ========================================= */
 const destinationsContainer = document.querySelector("#destinations-container");
 const resultsCount = document.querySelector("#results-count");
-const initialMessage = document.querySelector("#initial-message");
 
 /* =========================================
    ESTADO DE LA APLICACIÓN
@@ -27,15 +32,7 @@ async function init() {
   /* =====================================
      MOSTRAR ESTADO DE CARGA
   ====================================== */
-  initialMessage.innerHTML = `
-    <div class="text-5xl mb-4">🌎</div>
-    <h3 class="text-xl font-semibold text-slate-800 mb-2">
-      Cargando destinos...
-    </h3>
-    <p class="text-slate-500">
-      Estamos consultando información de países alrededor del mundo.
-    </p>
-  `;
+  mostrarCargando(destinationsContainer);
 
   /* =====================================
      OBTENER PAÍSES DESDE LA API
@@ -43,42 +40,27 @@ async function init() {
   paises = await obtenerPaises();
 
   /* =====================================
-     COMPROBAR RESULTADOS
+     VALIDAR RESULTADOS
+  ====================================== */
+  if (paises.length === 0) {
+    mostrarError(destinationsContainer);
+    actualizarContador(paises.length, resultsCount);
+    return;
+  }
+
+  /* =====================================
+     RENDERIZAR DESTINOS Y CONTADOR
+  ====================================== */
+  renderPaises(paises, destinationsContainer);
+  actualizarContador(paises.length, resultsCount);
+
+  /* =====================================
+     LOGS DE CONSOLA
   ====================================== */
   console.log("Países obtenidos:", paises);
-
-  /* =====================================
-     ACTUALIZAR CONTADOR
-  ====================================== */
-  resultsCount.textContent = `${paises.length} destinos`;
-
-  /* =====================================
-     MOSTRAR RESULTADO DE LA CARGA
-  ====================================== */
-  if (paises.length > 0) {
-    initialMessage.innerHTML = `
-      <div class="text-5xl mb-4">✅</div>
-      <h3 class="text-xl font-semibold text-slate-800 mb-2">
-        Destinos cargados
-      </h3>
-      <p class="text-slate-500">
-        Se obtuvieron ${paises.length} destinos correctamente.
-      </p>
-    `;
-  } else {
-    initialMessage.innerHTML = `
-      <div class="text-5xl mb-4">⚠️</div>
-      <h3 class="text-xl font-semibold text-slate-800 mb-2">
-        No fue posible cargar los destinos
-      </h3>
-      <p class="text-slate-500">
-        Verifica tu conexión e intenta nuevamente.
-      </p>
-    `;
-  }
-} // <-- AQUÍ CIERRA LA FUNCIÓN INIT
+}
 
 /* =========================================
    INICIAR APLICACIÓN
 ========================================= */
-init(); // <-- LLAMADA A LA FUNCIÓN FUERA DE LA DECLARACIÓN
+init();
